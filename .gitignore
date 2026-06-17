@@ -1,0 +1,20 @@
+# Gradle
+.gradle/
+build/
+run/
+repo/
+src/generated/resources/
+
+# IntelliJ IDEA
+.idea/
+*.iml
+out/
+
+# Eclipse
+.classpath
+.project
+.settings/
+bin/
+
+# macOS
+.DS_Store
