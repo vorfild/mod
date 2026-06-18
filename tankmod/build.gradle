@@ -20,8 +20,8 @@ java.toolchain.languageVersion = JavaLanguageVersion.of(21)
 sourceSets {
     main
     datagen {
-        compileClasspath += main.compileClasspath
-        runtimeClasspath += main.runtimeClasspath
+        compileClasspath += main.compileClasspath + main.output
+        runtimeClasspath += main.runtimeClasspath + main.output
     }
 }
 

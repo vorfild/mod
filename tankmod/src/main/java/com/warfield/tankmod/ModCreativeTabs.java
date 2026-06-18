@@ -19,6 +19,8 @@ public class ModCreativeTabs {
                             .displayItems((params, output) -> {
                                 output.accept(ModItems.TANK_SPAWNER.get());
                                 output.accept(ModItems.TANK_SHELL.get());
+                                output.accept(ModItems.TANK_BARREL.get());
+                                output.accept(ModItems.TANK_HULL.get());
                             })
                             .build()
             );

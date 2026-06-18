@@ -43,9 +43,21 @@ public class ModItems {
             }
     );
 
-    /** Снаряд-расходник (Фаза 3). Пока только зарегистрирован, логика добавится позже. */
+    /** Снаряд-расходник: загружается в танк через ПКМ. */
     public static final DeferredItem<Item> TANK_SHELL = ITEMS.registerItem(
             "tank_shell",
             props -> new Item(props.stacksTo(16))
+    );
+
+    /** Промежуточный компонент: стальной ствол орудия (3 iron_block в ряд). */
+    public static final DeferredItem<Item> TANK_BARREL = ITEMS.registerItem(
+            "tank_barrel",
+            props -> new Item(props.stacksTo(1))
+    );
+
+    /** Промежуточный компонент: бронекорпус (8 iron_block в форме «О»). */
+    public static final DeferredItem<Item> TANK_HULL = ITEMS.registerItem(
+            "tank_hull",
+            props -> new Item(props.stacksTo(1))
     );
 }

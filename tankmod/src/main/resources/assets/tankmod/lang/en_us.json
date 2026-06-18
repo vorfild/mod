@@ -4,6 +4,8 @@
     "item.tankmod.tank_shell": "75mm Shell",
     "entity.tankmod.tank": "Panther",
     "entity.tankmod.tank_shell_entity": "75mm Shell",
+    "item.tankmod.tank_barrel": "Tank Barrel",
+    "item.tankmod.tank_hull": "Tank Hull",
     "tankmod.hatch.closed": "Buttoned up (protected)",
     "tankmod.hatch.open": "Head out (vulnerable!)",
     "tankmod.ammo": "Ammo: %s/%s",
