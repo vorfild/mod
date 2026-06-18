@@ -9,17 +9,16 @@ import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.RenderGuiEvent;
-import net.neoforged.neoforge.client.event.RenderGuiOverlayEvent;
-import net.neoforged.neoforge.client.gui.overlay.VanillaGuiOverlay;
 
 /**
  * Фаза 7: кокпит-HUD танка.
  *
- * Рисуется поверх всего GUI:
+ * Рисуется поверх всего GUI (RenderGuiEvent.Post):
  *  - тёмная рамка по краям экрана (имитация смотрового люка)
- *  - прицельная сетка вместо стандартного крестика
+ *  - прицельная сетка с дальномером; тёмный фон под крестиком перекрывает ванильный
  *  - полоса HP (нижний-левый угол)
  *  - счётчик снарядов / полоса перезарядки (нижний-правый)
+ *  - скорость (нижний-центр)
  */
 @EventBusSubscriber(modid = TankMod.MODID, bus = EventBusSubscriber.Bus.GAME, value = Dist.CLIENT)
 public class TankHudOverlay {
@@ -51,6 +50,10 @@ public class TankHudOverlay {
         // ── Прицельная сетка ─────────────────────────────────────────────
         int cx = w / 2, cy = h / 2;
         int arm = 18, gap = 5, thick = 1;
+
+        // Тёмный фон в центре перекрывает ванильный белый крест MC
+        g.fill(cx - 8, cy - 8, cx + 8, cy + 8, 0xFF111111);
+
         // горизонтальные плечи
         g.fill(cx - arm - gap, cy - thick, cx - gap,       cy + thick, SCOPE_COLOR);
         g.fill(cx + gap,       cy - thick, cx + arm + gap, cy + thick, SCOPE_COLOR);
@@ -60,15 +63,13 @@ public class TankHudOverlay {
         // центральная точка
         g.fill(cx - 2, cy - 2, cx + 2, cy + 2, SCOPE_COLOR);
 
-        // ── Дальномерные штрихи (горизонтальная линия с насечками) ───────
+        // ── Дальномерные штрихи ───────────────────────────────────────────
         for (int i = -3; i <= 3; i++) {
             if (i == 0) continue;
             int lx = cx + i * 24;
             int lh = (Math.abs(i) == 1) ? 5 : 3;
             g.fill(lx - thick, cy - lh, lx + thick, cy + lh, SCOPE_COLOR);
         }
-
-        // ── Горизонтальная линия дальномера ──────────────────────────────
         g.fill(cx - 80, cy, cx - gap - arm - 4, cy + thick, 0x66228822);
         g.fill(cx + gap + arm + 4, cy, cx + 80, cy + thick, 0x66228822);
 
@@ -103,20 +104,10 @@ public class TankHudOverlay {
         }
 
         // ── Скорость (нижний-центр) ───────────────────────────────────────
-        float speedKmh = tank.getSpeed() * 20 * 3.6f;  // блоков/тик → км/ч (условно)
+        float speedKmh = tank.getSpeed() * 20 * 3.6f;
         String speedStr = String.format("%+.0f км/ч", speedKmh);
         int strW = mc.font.width(speedStr);
         g.drawString(mc.font, speedStr, (w - strW) / 2, h - by - 22, TEXT_COLOR, false);
-    }
-
-    /** Скрываем ванильный прицел — у нас своя прицельная сетка. */
-    @SubscribeEvent
-    public static void hideCrosshair(RenderGuiOverlayEvent.Pre event) {
-        Minecraft mc = Minecraft.getInstance();
-        if (mc.player != null && mc.player.getVehicle() instanceof TankEntity
-                && event.getOverlay() == VanillaGuiOverlay.CROSSHAIR.type()) {
-            event.setCanceled(true);
-        }
     }
 
     private static void drawBar(GuiGraphics g, int x, int y, int w, int h,
