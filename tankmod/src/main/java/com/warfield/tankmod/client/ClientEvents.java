@@ -5,6 +5,7 @@ import com.warfield.tankmod.TankMod;
 import com.warfield.tankmod.client.renderer.TankRenderer;
 import com.warfield.tankmod.entity.TankEntity;
 import com.warfield.tankmod.network.TankInputPacket;
+import com.warfield.tankmod.network.TankTurretPacket;
 import net.minecraft.client.Minecraft;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -36,29 +37,45 @@ public class ClientEvents {
 @EventBusSubscriber(modid = TankMod.MODID, bus = EventBusSubscriber.Bus.GAME, value = Dist.CLIENT)
 class TankInputHandler {
 
-    /** Последний отправленный ввод — сравниваем, чтобы не слать пакеты каждый тик. */
+    /** Последний отправленный ввод движения — не слать пакеты каждый тик без изменений. */
     private static TankInputPacket lastSentInput = new TankInputPacket(false, false, false, false);
 
+    /** Последний отправленный угол башни (мировой, градусы). */
+    private static float lastSentTurretYaw = Float.NaN;
+
     /**
-     * Каждый тик: если игрок едет на танке — считываем нажатые клавиши.
-     * Пакет отправляется ТОЛЬКО при изменении состояния клавиш.
-     * Таким образом при постоянно зажатой W отправляется 1 пакет, а не 20/сек.
+     * Каждый тик: если игрок едет на танке — считываем клавиши и угол взгляда.
+     * Пакеты отправляются ТОЛЬКО при изменении состояния (оптимизация трафика).
      */
     @SubscribeEvent
     public static void onClientTick(ClientTickEvent.Post event) {
         Minecraft mc = Minecraft.getInstance();
-        if (mc.player == null || !(mc.player.getVehicle() instanceof TankEntity)) return;
+        if (mc.player == null || !(mc.player.getVehicle() instanceof TankEntity)) {
+            // Сбрасываем при выходе из танка
+            lastSentInput = new TankInputPacket(false, false, false, false);
+            lastSentTurretYaw = Float.NaN;
+            return;
+        }
 
+        // ── Движение ──────────────────────────────────────────────────
         boolean fwd   = mc.options.keyUp.isDown();
         boolean back  = mc.options.keyDown.isDown();
         boolean left  = mc.options.keyLeft.isDown();
         boolean right = mc.options.keyRight.isDown();
 
         TankInputPacket newInput = new TankInputPacket(fwd, back, left, right);
-
         if (!newInput.equals(lastSentInput)) {
             PacketDistributor.sendToServer(newInput);
             lastSentInput = newInput;
+        }
+
+        // ── Поворот башни ─────────────────────────────────────────────
+        // getYRot() — мировой угол взгляда игрока (включает движение мышью).
+        // Порог 0.5° убирает микро-дрожание при неподвижной мыши.
+        float desiredYaw = mc.player.getYRot();
+        if (Float.isNaN(lastSentTurretYaw) || Math.abs(desiredYaw - lastSentTurretYaw) > 0.5f) {
+            PacketDistributor.sendToServer(new TankTurretPacket(desiredYaw));
+            lastSentTurretYaw = desiredYaw;
         }
     }
 }

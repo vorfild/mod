@@ -2,8 +2,8 @@ package com.warfield.tankmod.model;
 
 import com.warfield.tankmod.entity.TankEntity;
 import net.minecraft.resources.ResourceLocation;
+import software.bernie.geckolib.cache.object.GeoBone;
 import software.bernie.geckolib.model.GeoModel;
-import software.bernie.geckolib.model.data.EntityModelData;
 import software.bernie.geckolib.animation.AnimationState;
 
 /**
@@ -31,16 +31,26 @@ public class TankModel extends GeoModel<TankEntity> {
     }
 
     /**
-     * Поворот башни.
-     * Вызывается каждый кадр — не делаем тяжёлых вычислений, только setRotY.
-     *
-     * Фаза 2: здесь будет:
-     *   GeoBone turret = getAnimationProcessor().getBone("turret");
-     *   if (turret != null) turret.setRotY((float) Math.toRadians(entity.getTurretYaw()));
+     * Вызывается каждый кадр на стороне клиента.
+     * Здесь поворачиваем кость «turret» в соответствии с DATA_TURRET_YAW.
+     * gun_barrel и hatch — дочерние кости turret, поворачиваются автоматически.
      */
     @Override
     public void setCustomAnimations(TankEntity entity, long instanceId,
                                     AnimationState<TankEntity> animationState) {
-        // Фаза 1: пока пусто. Поворот башни подключается в Фазе 2.
+        GeoBone turret = getAnimationProcessor().getBone("turret");
+        if (turret == null) return;
+
+        // Мировой угол башни (хранится в SynchedEntityData, реплицируется всем клиентам)
+        float worldTurretYaw = entity.getTurretYaw();
+        // Мировой угол корпуса танка (Minecraft-конвенция: 0=юг, 90=запад, CW)
+        float tankBodyYaw = entity.getYRot();
+
+        // Относительный угол в градусах (на сколько башня повёрнута относительно корпуса)
+        float relativeYaw = worldTurretYaw - tankBodyYaw;
+
+        // GeckoLib использует правую систему координат: положительное rotY = CCW
+        // Minecraft yRot увеличивается по часовой стрелке → инвертируем знак
+        turret.setRotY((float) -Math.toRadians(relativeYaw));
     }
 }

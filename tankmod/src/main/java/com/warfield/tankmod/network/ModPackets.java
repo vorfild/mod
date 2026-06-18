@@ -21,14 +21,21 @@ public class ModPackets {
     public static void onRegisterPayloads(RegisterPayloadsEvent event) {
         var reg = event.registrar("tankmod");
 
-        // Фаза 1: ввод движения
+        // Фаза 1: ввод движения (W/A/S/D)
         reg.playToServer(
                 TankInputPacket.TYPE,
                 TankInputPacket.STREAM_CODEC,
                 ModPackets::handleTankInput
         );
 
-        // Фазы 2–5: пакеты будут добавлены при расширении
+        // Фаза 2: поворот башни
+        reg.playToServer(
+                TankTurretPacket.TYPE,
+                TankTurretPacket.STREAM_CODEC,
+                ModPackets::handleTankTurret
+        );
+
+        // Фазы 3–5: пакеты будут добавлены при расширении
     }
 
     // ─────────────────────────────────────────────────────────────────────
@@ -44,6 +51,18 @@ public class ModPackets {
             if (!(ctx.player() instanceof ServerPlayer player)) return;
             if (player.getVehicle() instanceof TankEntity tank) {
                 tank.setInput(packet.fwd(), packet.back(), packet.left(), packet.right());
+            }
+        });
+    }
+
+    /**
+     * Обновляем угол башни на сервере (и через SynchedEntityData — на всех клиентах).
+     */
+    private static void handleTankTurret(TankTurretPacket packet, IPayloadContext ctx) {
+        ctx.enqueueWork(() -> {
+            if (!(ctx.player() instanceof ServerPlayer player)) return;
+            if (player.getVehicle() instanceof TankEntity tank) {
+                tank.setTurretYaw(packet.yaw());
             }
         });
     }
