@@ -1,0 +1,10 @@
+{
+    "itemGroup.tankmod": "Танки",
+    "item.tankmod.tank_spawner": "Танк «Пантера»",
+    "item.tankmod.tank_shell": "Снаряд 75мм",
+    "entity.tankmod.tank": "Пантера",
+    "tankmod.hatch.closed": "Закрыт (защищён)",
+    "tankmod.hatch.open": "Высунулся (уязвим!)",
+    "tankmod.ammo": "Боезапас: %s/%s",
+    "tankmod.reloading": "Перезарядка..."
+}

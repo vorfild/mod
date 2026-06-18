@@ -1,0 +1,22 @@
+{
+  "format_version": "1.8.0",
+  "animations": {
+    "animation.panther.idle": {
+      "loop": true,
+      "animation_length": 1,
+      "bones": {}
+    },
+    "animation.panther.tracks": {
+      "loop": true,
+      "animation_length": 1,
+      "bones": {
+        "track_left": {
+          "rotation": { "0.0": [0, 0, 0] }
+        },
+        "track_right": {
+          "rotation": { "0.0": [0, 0, 0] }
+        }
+      }
+    }
+  }
+}

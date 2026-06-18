@@ -1,0 +1,10 @@
+{
+    "itemGroup.tankmod": "Tank Mod",
+    "item.tankmod.tank_spawner": "Panther Tank",
+    "item.tankmod.tank_shell": "75mm Shell",
+    "entity.tankmod.tank": "Panther",
+    "tankmod.hatch.closed": "Buttoned up (protected)",
+    "tankmod.hatch.open": "Head out (vulnerable!)",
+    "tankmod.ammo": "Ammo: %s/%s",
+    "tankmod.reloading": "Reloading..."
+}
