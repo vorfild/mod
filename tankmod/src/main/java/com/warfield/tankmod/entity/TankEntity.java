@@ -3,6 +3,7 @@ package com.warfield.tankmod.entity;
 import com.warfield.tankmod.Config;
 import com.warfield.tankmod.ModItems;
 import com.warfield.tankmod.TankMod;
+import net.minecraft.tags.DamageTypeTags;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.Packet;
@@ -238,11 +239,13 @@ public class TankEntity extends Entity implements GeoEntity {
     public boolean hurt(DamageSource source, float amount) {
         if (level().isClientSide() || isRemoved()) return false;
 
-        // Фаза 4 добавит фильтрацию: только IS_EXPLOSION и TANK_SHELL пройдут.
-        // Пока принимаем любой урон для отладки.
+        // Избирательная неуязвимость: только взрывы и собственные снаряды пробивают броню.
+        boolean isExplosion = source.is(DamageTypeTags.IS_EXPLOSION);
+        boolean isTankShell = source.is(ModDamageTypes.TANK_SHELL);
+        if (!isExplosion && !isTankShell) return false;
+
         float health = entityData.get(DATA_HEALTH) - amount;
         if (health <= 0) {
-            // Танк уничтожен
             TankMod.LOGGER.info("[TankMod] Танк уничтожен ({}).", getId());
             remove(RemovalReason.KILLED);
         } else {

@@ -6,5 +6,7 @@
     "tankmod.hatch.closed": "Закрыт (защищён)",
     "tankmod.hatch.open": "Высунулся (уязвим!)",
     "tankmod.ammo": "Боезапас: %s/%s",
-    "tankmod.reloading": "Перезарядка..."
+    "tankmod.reloading": "Перезарядка...",
+    "key.categories.tankmod": "Танки",
+    "key.tankmod.toggle_hatch": "Переключить люк"
 }

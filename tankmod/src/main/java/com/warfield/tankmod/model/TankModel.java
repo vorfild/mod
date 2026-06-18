@@ -38,19 +38,21 @@ public class TankModel extends GeoModel<TankEntity> {
     @Override
     public void setCustomAnimations(TankEntity entity, long instanceId,
                                     AnimationState<TankEntity> animationState) {
+        // ── Поворот башни ─────────────────────────────────────────────────
         GeoBone turret = getAnimationProcessor().getBone("turret");
-        if (turret == null) return;
+        if (turret != null) {
+            float worldTurretYaw = entity.getTurretYaw();
+            float tankBodyYaw    = entity.getYRot();
+            float relativeYaw    = worldTurretYaw - tankBodyYaw;
+            // GeckoLib: positive rotY = CCW; MC yRot positive = CW → negate
+            turret.setRotY((float) -Math.toRadians(relativeYaw));
+        }
 
-        // Мировой угол башни (хранится в SynchedEntityData, реплицируется всем клиентам)
-        float worldTurretYaw = entity.getTurretYaw();
-        // Мировой угол корпуса танка (Minecraft-конвенция: 0=юг, 90=запад, CW)
-        float tankBodyYaw = entity.getYRot();
-
-        // Относительный угол в градусах (на сколько башня повёрнута относительно корпуса)
-        float relativeYaw = worldTurretYaw - tankBodyYaw;
-
-        // GeckoLib использует правую систему координат: положительное rotY = CCW
-        // Minecraft yRot увеличивается по часовой стрелке → инвертируем знак
-        turret.setRotY((float) -Math.toRadians(relativeYaw));
+        // ── Люк: открыт / закрыт ─────────────────────────────────────────
+        GeoBone hatch = getAnimationProcessor().getBone("hatch");
+        if (hatch != null) {
+            // Открыт → крышка откидывается на -90° по X (назад относительно турели)
+            hatch.setRotX(entity.isHatchOpen() ? (float) Math.toRadians(-90) : 0f);
+        }
     }
 }

@@ -5,6 +5,7 @@ import com.warfield.tankmod.TankMod;
 import com.warfield.tankmod.client.renderer.TankRenderer;
 import com.warfield.tankmod.client.renderer.TankShellRenderer;
 import com.warfield.tankmod.entity.TankEntity;
+import com.warfield.tankmod.network.TankHatchPacket;
 import com.warfield.tankmod.network.TankInputPacket;
 import com.warfield.tankmod.network.TankShootPacket;
 import com.warfield.tankmod.network.TankTurretPacket;
@@ -89,6 +90,13 @@ class TankInputHandler {
             PacketDistributor.sendToServer(new TankShootPacket());
         }
         wasAttackDown = isAttackDown;
+
+        // ── Переключение люка (клавиша R) ─────────────────────────────
+        if (ModKeyMappings.TOGGLE_HATCH != null) {
+            while (ModKeyMappings.TOGGLE_HATCH.consumeClick()) {
+                PacketDistributor.sendToServer(new TankHatchPacket());
+            }
+        }
 
         // ── HUD: боезапас (обновляем каждые 10 тиков) ─────────────────
         if (mc.player.tickCount % 10 == 0) {

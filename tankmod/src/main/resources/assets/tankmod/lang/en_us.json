@@ -3,8 +3,11 @@
     "item.tankmod.tank_spawner": "Panther Tank",
     "item.tankmod.tank_shell": "75mm Shell",
     "entity.tankmod.tank": "Panther",
+    "entity.tankmod.tank_shell_entity": "75mm Shell",
     "tankmod.hatch.closed": "Buttoned up (protected)",
     "tankmod.hatch.open": "Head out (vulnerable!)",
     "tankmod.ammo": "Ammo: %s/%s",
-    "tankmod.reloading": "Reloading..."
+    "tankmod.reloading": "Reloading...",
+    "key.categories.tankmod": "Tanks",
+    "key.tankmod.toggle_hatch": "Toggle Hatch"
 }

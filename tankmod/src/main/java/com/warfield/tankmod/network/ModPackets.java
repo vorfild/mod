@@ -42,7 +42,12 @@ public class ModPackets {
                 ModPackets::handleTankShoot
         );
 
-        // Фазы 4–5: пакеты будут добавлены при расширении
+        // Фаза 5: переключение люка
+        reg.playToServer(
+                TankHatchPacket.TYPE,
+                TankHatchPacket.STREAM_CODEC,
+                ModPackets::handleTankHatch
+        );
     }
 
     // ─────────────────────────────────────────────────────────────────────
@@ -82,6 +87,21 @@ public class ModPackets {
             if (!(ctx.player() instanceof ServerPlayer player)) return;
             if (player.getVehicle() instanceof TankEntity tank) {
                 tank.shoot();
+            }
+        });
+    }
+
+    /**
+     * Переключаем состояние люка и сообщаем водителю текущий статус.
+     */
+    private static void handleTankHatch(TankHatchPacket packet, IPayloadContext ctx) {
+        ctx.enqueueWork(() -> {
+            if (!(ctx.player() instanceof ServerPlayer player)) return;
+            if (player.getVehicle() instanceof TankEntity tank) {
+                boolean nowOpen = !tank.isHatchOpen();
+                tank.setHatchOpen(nowOpen);
+                String key = nowOpen ? "tankmod.hatch.open" : "tankmod.hatch.closed";
+                player.displayClientMessage(net.minecraft.network.chat.Component.translatable(key), true);
             }
         });
     }
