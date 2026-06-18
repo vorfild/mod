@@ -1,6 +1,7 @@
 package com.warfield.tankmod;
 
 import com.warfield.tankmod.entity.TankEntity;
+import com.warfield.tankmod.entity.TankShellEntity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
 import net.neoforged.neoforge.registries.DeferredHolder;
@@ -21,7 +22,16 @@ public class ModEntities {
             ENTITIES.register("tank", () ->
                     EntityType.Builder.<TankEntity>of(TankEntity::new, MobCategory.MISC)
                             .sized(2.5f, 1.5f)
-                            .setTrackingRange(80)   // дальность передачи данных клиенту
+                            .setTrackingRange(80)
+                            .build()
+            );
+
+    /** Снаряд 75mm KwK 42. Маленький хитбокс, высокая скорость, живёт ≤200 тиков. */
+    public static final DeferredHolder<EntityType<?>, EntityType<TankShellEntity>> TANK_SHELL_ENTITY =
+            ENTITIES.register("tank_shell_entity", () ->
+                    EntityType.Builder.<TankShellEntity>of(TankShellEntity::new, MobCategory.MISC)
+                            .sized(0.3f, 0.3f)
+                            .setTrackingRange(80)
                             .build()
             );
 }

@@ -1,8 +1,10 @@
 package com.warfield.tankmod.entity;
 
 import com.warfield.tankmod.Config;
+import com.warfield.tankmod.ModItems;
 import com.warfield.tankmod.TankMod;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;
@@ -15,6 +17,7 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import software.bernie.geckolib.animatable.GeoEntity;
@@ -51,8 +54,12 @@ public class TankEntity extends Entity implements GeoEntity {
     private static final EntityDataAccessor<Float> DATA_HEALTH =
             SynchedEntityData.defineId(TankEntity.class, EntityDataSerializers.FLOAT);
 
-    /** Тики до конца перезарядки (фаза 3) */
+    /** Тики до конца перезарядки */
     private static final EntityDataAccessor<Integer> DATA_RELOAD_TIMER =
+            SynchedEntityData.defineId(TankEntity.class, EntityDataSerializers.INT);
+
+    /** Максимальный боезапас (реплицируется на клиент для HUD). */
+    private static final EntityDataAccessor<Integer> DATA_MAX_SHELLS =
             SynchedEntityData.defineId(TankEntity.class, EntityDataSerializers.INT);
 
     // ─── Локальные поля движения (только сервер) ───
@@ -83,6 +90,7 @@ public class TankEntity extends Entity implements GeoEntity {
         builder.define(DATA_HATCH_OPEN,    false);
         builder.define(DATA_HEALTH,        (float) Config.TANK_HEALTH.get());
         builder.define(DATA_RELOAD_TIMER,  0);
+        builder.define(DATA_MAX_SHELLS,    Config.SHELL_CAPACITY.get());
     }
 
     // ─────────────────────────────────────────────────────────────────────
@@ -91,12 +99,31 @@ public class TankEntity extends Entity implements GeoEntity {
 
     @Override
     public InteractionResult interact(Player player, InteractionHand hand) {
-        // Только одно место — наводчик/водитель
-        if (!level().isClientSide() && !isVehicle()) {
+        if (level().isClientSide()) return InteractionResult.sidedSuccess(true);
+
+        ItemStack heldItem = player.getItemInHand(hand);
+
+        // ПКМ с tank_shell → погрузить снаряд
+        if (heldItem.is(ModItems.TANK_SHELL.get())) {
+            int loaded   = entityData.get(DATA_LOADED_SHELLS);
+            int capacity = entityData.get(DATA_MAX_SHELLS);
+            if (loaded < capacity) {
+                entityData.set(DATA_LOADED_SHELLS, loaded + 1);
+                if (!player.isCreative()) heldItem.shrink(1);
+                player.displayClientMessage(
+                        Component.translatable("tankmod.ammo", loaded + 1, capacity), true);
+                return InteractionResult.SUCCESS;
+            }
+            return InteractionResult.FAIL;
+        }
+
+        // ПКМ без снаряда → сесть в танк (если не занято)
+        if (!isVehicle()) {
             player.startRiding(this);
             return InteractionResult.SUCCESS;
         }
-        return InteractionResult.sidedSuccess(level().isClientSide());
+
+        return InteractionResult.PASS;
     }
 
     /** Размещаем пассажира внутри башни, чуть выше середины корпуса. */
@@ -234,6 +261,8 @@ public class TankEntity extends Entity implements GeoEntity {
     public int  getLoadedShells()  { return entityData.get(DATA_LOADED_SHELLS); }
     public void setLoadedShells(int n) { entityData.set(DATA_LOADED_SHELLS, n); }
 
+    public int  getMaxShells()     { return entityData.get(DATA_MAX_SHELLS); }
+
     public boolean isHatchOpen()   { return entityData.get(DATA_HATCH_OPEN); }
     public void    setHatchOpen(boolean open) { entityData.set(DATA_HATCH_OPEN, open); }
 
@@ -243,6 +272,22 @@ public class TankEntity extends Entity implements GeoEntity {
     public void setReloadTimer(int t)  { entityData.set(DATA_RELOAD_TIMER, t); }
 
     public float getSpeed()        { return speed; }
+
+    /**
+     * Выстрел снарядом (вызывается из сервера по TankShootPacket).
+     * Проверяет условия: боезапас > 0, перезарядка завершена.
+     */
+    public void shoot() {
+        if (level().isClientSide()) return;
+        int loaded = entityData.get(DATA_LOADED_SHELLS);
+        if (loaded <= 0 || entityData.get(DATA_RELOAD_TIMER) > 0) return;
+
+        TankShellEntity shell = new TankShellEntity(this, level());
+        level().addFreshEntity(shell);
+
+        entityData.set(DATA_LOADED_SHELLS, loaded - 1);
+        entityData.set(DATA_RELOAD_TIMER, Config.RELOAD_TICKS.get());
+    }
 
     // ─────────────────────────────────────────────────────────────────────
     // NBT — сохранение/загрузка состояния при перезагрузке мира

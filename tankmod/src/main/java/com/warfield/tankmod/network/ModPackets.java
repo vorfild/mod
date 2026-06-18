@@ -35,7 +35,14 @@ public class ModPackets {
                 ModPackets::handleTankTurret
         );
 
-        // Фазы 3–5: пакеты будут добавлены при расширении
+        // Фаза 3: выстрел
+        reg.playToServer(
+                TankShootPacket.TYPE,
+                TankShootPacket.STREAM_CODEC,
+                ModPackets::handleTankShoot
+        );
+
+        // Фазы 4–5: пакеты будут добавлены при расширении
     }
 
     // ─────────────────────────────────────────────────────────────────────
@@ -63,6 +70,18 @@ public class ModPackets {
             if (!(ctx.player() instanceof ServerPlayer player)) return;
             if (player.getVehicle() instanceof TankEntity tank) {
                 tank.setTurretYaw(packet.yaw());
+            }
+        });
+    }
+
+    /**
+     * Игрок нажал кнопку выстрела. Сервер проверяет условия и создаёт снаряд.
+     */
+    private static void handleTankShoot(TankShootPacket packet, IPayloadContext ctx) {
+        ctx.enqueueWork(() -> {
+            if (!(ctx.player() instanceof ServerPlayer player)) return;
+            if (player.getVehicle() instanceof TankEntity tank) {
+                tank.shoot();
             }
         });
     }
