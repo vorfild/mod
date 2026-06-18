@@ -135,7 +135,7 @@ public class TankEntity extends Entity implements GeoEntity {
         // Смещение: по центру X/Z, Y = верхушка корпуса (~1.1 блока от земли)
         double rYaw = Math.toRadians(getYRot());
         double px = getX() - Math.sin(rYaw) * 0.1;
-        double py = getY() + 2.5;
+        double py = getY() + 1.5;
         double pz = getZ() + Math.cos(rYaw) * 0.1;
         moveFunction.accept(passenger, px, py, pz);
         // Пассажир смотрит туда же, куда башня (в фазе 2 — куда башня, пока — корпус)

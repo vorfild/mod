@@ -9,7 +9,6 @@ import com.warfield.tankmod.network.TankHatchPacket;
 import com.warfield.tankmod.network.TankInputPacket;
 import com.warfield.tankmod.network.TankShootPacket;
 import com.warfield.tankmod.network.TankTurretPacket;
-import net.minecraft.network.chat.Component;
 import net.minecraft.client.Minecraft;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -98,16 +97,5 @@ class TankInputHandler {
             }
         }
 
-        // ── HUD: боезапас (обновляем каждые 10 тиков) ─────────────────
-        if (mc.player.tickCount % 10 == 0) {
-            Component hud;
-            if (tank.getReloadTimer() > 0) {
-                hud = Component.translatable("tankmod.reloading");
-            } else {
-                hud = Component.translatable("tankmod.ammo",
-                        tank.getLoadedShells(), tank.getMaxShells());
-            }
-            mc.player.displayClientMessage(hud, true); // true = ActionBar (над хотбаром)
-        }
     }
 }
