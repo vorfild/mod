@@ -27,8 +27,8 @@ public class Config {
                 .defineInRange("reload_ticks", 60, 10, 400);
 
         SHELL_CAPACITY = BUILDER
-                .comment("Максимальный боезапас в танке")
-                .defineInRange("shell_capacity", 5, 1, 32);
+                .comment("Максимальный боезапас в танке (Пантера Ausf.A/D: 79 снарядов)")
+                .defineInRange("shell_capacity", 79, 1, 100);
 
         SHELL_DAMAGE = BUILDER
                 .comment("Урон снаряда в эпицентре взрыва (сердечки × 2 = HP)")

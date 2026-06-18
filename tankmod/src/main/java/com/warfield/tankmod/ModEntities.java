@@ -21,8 +21,9 @@ public class ModEntities {
     public static final DeferredHolder<EntityType<?>, EntityType<TankEntity>> TANK =
             ENTITIES.register("tank", () ->
                     EntityType.Builder.<TankEntity>of(TankEntity::new, MobCategory.MISC)
-                            .sized(2.5f, 1.5f)
+                            .sized(4.0f, 3.0f)
                             .setTrackingRange(80)
+                            .setUpdateInterval(1)
                             .build("tankmod:tank")
             );
 

@@ -104,15 +104,16 @@ public class TankEntity extends Entity implements GeoEntity {
 
         ItemStack heldItem = player.getItemInHand(hand);
 
-        // ПКМ с tank_shell → погрузить снаряд
+        // ПКМ с tank_shell → погрузить весь стек сразу
         if (heldItem.is(ModItems.TANK_SHELL.get())) {
             int loaded   = entityData.get(DATA_LOADED_SHELLS);
             int capacity = entityData.get(DATA_MAX_SHELLS);
-            if (loaded < capacity) {
-                entityData.set(DATA_LOADED_SHELLS, loaded + 1);
-                if (!player.isCreative()) heldItem.shrink(1);
+            int canLoad  = Math.min(capacity - loaded, heldItem.getCount());
+            if (canLoad > 0) {
+                entityData.set(DATA_LOADED_SHELLS, loaded + canLoad);
+                if (!player.isCreative()) heldItem.shrink(canLoad);
                 player.displayClientMessage(
-                        Component.translatable("tankmod.ammo", loaded + 1, capacity), true);
+                        Component.translatable("tankmod.ammo", loaded + canLoad, capacity), true);
                 return InteractionResult.SUCCESS;
             }
             return InteractionResult.FAIL;
@@ -134,7 +135,7 @@ public class TankEntity extends Entity implements GeoEntity {
         // Смещение: по центру X/Z, Y = верхушка корпуса (~1.1 блока от земли)
         double rYaw = Math.toRadians(getYRot());
         double px = getX() - Math.sin(rYaw) * 0.1;
-        double py = getY() + 1.1;
+        double py = getY() + 2.5;
         double pz = getZ() + Math.cos(rYaw) * 0.1;
         moveFunction.accept(passenger, px, py, pz);
         // Пассажир смотрит туда же, куда башня (в фазе 2 — куда башня, пока — корпус)

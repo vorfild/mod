@@ -44,8 +44,8 @@ public class TankModel extends GeoModel<TankEntity> {
             float worldTurretYaw = entity.getTurretYaw();
             float tankBodyYaw    = entity.getYRot();
             float relativeYaw    = worldTurretYaw - tankBodyYaw;
-            // GeckoLib: positive rotY = CCW; MC yRot positive = CW → negate
-            turret.setRotY((float) -Math.toRadians(relativeYaw));
+            // MC yRot CW → GeckoLib rotY без инверсии (обе системы совпадают после учёта рендера)
+            turret.setRotY((float) Math.toRadians(relativeYaw));
         }
 
         // ── Люк: открыт / закрыт ─────────────────────────────────────────
