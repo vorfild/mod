@@ -5,7 +5,7 @@ import com.warfield.tankmod.entity.TankEntity;
 import net.minecraft.world.entity.Entity;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.event.entity.living.LivingAttackEvent;
+import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
 
 /**
  * Серверные игровые события мода (GAME bus).
@@ -15,7 +15,7 @@ import net.neoforged.neoforge.event.entity.living.LivingAttackEvent;
 public class TankEventHandler {
 
     @SubscribeEvent
-    public static void onLivingAttack(LivingAttackEvent event) {
+    public static void onLivingAttack(LivingIncomingDamageEvent event) {
         Entity entity = event.getEntity();
         // Защищаем только пассажира (не сам танк)
         if (entity.getVehicle() instanceof TankEntity tank && !tank.isHatchOpen()) {

@@ -23,7 +23,7 @@ public class ModEntities {
                     EntityType.Builder.<TankEntity>of(TankEntity::new, MobCategory.MISC)
                             .sized(2.5f, 1.5f)
                             .setTrackingRange(80)
-                            .build()
+                            .build("tankmod:tank")
             );
 
     /** Снаряд 75mm KwK 42. Маленький хитбокс, высокая скорость, живёт ≤200 тиков. */
@@ -32,6 +32,6 @@ public class ModEntities {
                     EntityType.Builder.<TankShellEntity>of(TankShellEntity::new, MobCategory.MISC)
                             .sized(0.3f, 0.3f)
                             .setTrackingRange(80)
-                            .build()
+                            .build("tankmod:tank_shell_entity")
             );
 }

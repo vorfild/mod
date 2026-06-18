@@ -23,7 +23,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import software.bernie.geckolib.animatable.GeoEntity;
 import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
-import software.bernie.geckolib.animatable.manager.AnimatableManager;
+import software.bernie.geckolib.animatable.AnimatableManager;
 import software.bernie.geckolib.animation.AnimationController;
 import software.bernie.geckolib.animation.PlayState;
 import software.bernie.geckolib.util.GeckoLibUtil;
@@ -89,7 +89,7 @@ public class TankEntity extends Entity implements GeoEntity {
         builder.define(DATA_TURRET_YAW,    0.0f);
         builder.define(DATA_LOADED_SHELLS, 0);
         builder.define(DATA_HATCH_OPEN,    false);
-        builder.define(DATA_HEALTH,        (float) Config.TANK_HEALTH.get());
+        builder.define(DATA_HEALTH,        Config.TANK_HEALTH.get().floatValue());
         builder.define(DATA_RELOAD_TIMER,  0);
         builder.define(DATA_MAX_SHELLS,    Config.SHELL_CAPACITY.get());
     }
@@ -298,7 +298,7 @@ public class TankEntity extends Entity implements GeoEntity {
 
     @Override
     protected void readAdditionalSaveData(CompoundTag tag) {
-        entityData.set(DATA_HEALTH,        tag.contains("TankHealth")   ? tag.getFloat("TankHealth")   : (float) Config.TANK_HEALTH.get());
+        entityData.set(DATA_HEALTH,        tag.contains("TankHealth")   ? tag.getFloat("TankHealth")   : Config.TANK_HEALTH.get().floatValue());
         entityData.set(DATA_LOADED_SHELLS, tag.contains("LoadedShells") ? tag.getInt("LoadedShells")   : 0);
         entityData.set(DATA_HATCH_OPEN,    tag.contains("HatchOpen")    ? tag.getBoolean("HatchOpen")  : false);
         entityData.set(DATA_TURRET_YAW,    tag.contains("TurretYaw")    ? tag.getFloat("TurretYaw")    : 0f);
