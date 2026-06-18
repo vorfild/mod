@@ -2,7 +2,7 @@ package com.warfield.tankmod.network;
 
 import com.warfield.tankmod.entity.TankEntity;
 import net.minecraft.server.level.ServerPlayer;
-import net.neoforged.neoforge.network.event.RegisterNetworkPayloadsEvent;
+import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 /**
@@ -18,7 +18,7 @@ import net.neoforged.neoforge.network.handling.IPayloadContext;
  */
 public class ModPackets {
 
-    public static void onRegisterPayloads(RegisterNetworkPayloadsEvent event) {
+    public static void onRegisterPayloads(RegisterPayloadHandlersEvent event) {
         var reg = event.registrar("tankmod");
 
         // Фаза 1: ввод движения (W/A/S/D)
